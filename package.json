@@ -1,0 +1,16 @@
+{
+  "name": "slash-bot",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^14.18.0",
+    "dotenv": "^16.5.0",
+    "mongoose": "^8.13.2"
+  },
+  "scripts": {
+    "commands": "node src/utils/createCommands.js",
+    "start": "node src/index.js"
+  },
+  "type": "module"
+}
