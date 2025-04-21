@@ -2,6 +2,8 @@ import { Client, Collection, GatewayIntentBits, Partials } from 'discord.js';
 import fs from 'fs';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
+import express from 'express';
+import { createServer } from 'http';
 
 dotenv.config();
 const client = new Client({
@@ -63,3 +65,18 @@ client.login(process.env.DISCORD_TOKEN)
     console.error('Error connecting to MongoDB:', error);
 }
 );
+
+// Start express server
+const app = express();
+const server = createServer(app);
+
+const PORT = process.env.PORT || 3000;
+
+app.get('/', (req, res) => {
+    res.send('Bot is running!');
+});
+
+server.listen(PORT, () => {
+    console.log(`Express server is running on port ${PORT}`);
+});
+
