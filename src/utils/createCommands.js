@@ -15,6 +15,7 @@ for (const file of commandFiles) {
 
 const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
 
+
 try {
     console.log('Started refreshing application (/) commands.');
     console.log(`Commands: ${JSON.stringify(commands)}`);
