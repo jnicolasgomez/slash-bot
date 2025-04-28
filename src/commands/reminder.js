@@ -16,7 +16,7 @@ export async function execute(client, interaction) {
     // fetch poll message and send a reminder mentioning users that haven't voted
     const pollMessageId = interaction.options.getString('poll-message-id');
     const pollMessage = await interaction.channel.messages.fetch(pollMessageId);
-    console.log(pollMessage);
+    //console.log(pollMessage);
     //console.log(getPollVoters(pollMessage.channelId, pollMessage.id, pollMessage.poll.answers[0].id));
     const nonVoters = await getNonVoters(client, pollMessage);
     const pollDuration = pollMessage.poll.expiresTimestamp;
