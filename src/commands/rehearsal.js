@@ -16,7 +16,7 @@ export const data = new SlashCommandBuilder()
 
 export async function execute(client, interaction) {
     const date = interaction.options.getString('date');
-    const answers = ["10:00am", "11:00am", "2:00pm", "4:00pm", "6:00pm", "7:00pm", "8:00pm", "9:00pm",];
+    const answers = ["10:00am", "11:00am", "2:00pm", "4:00pm", "6:00pm", "7:00pm", "8:00pm", "9:00pm","No puedo"];
     const pollDuration = 96; // 5 days in milliseconds
     //const poll = new Poll()
       //  .setQuestion(`@everyone Ensayo para el próximo ${dates}`);
