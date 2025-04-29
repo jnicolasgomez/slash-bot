@@ -17,9 +17,12 @@ export const data = new SlashCommandBuilder()
           .setRequired(true));
 
 export async function execute(client, interaction) {
-    const date = interaction.options.getString('date');
-    const poll  = createRehearsalPoll(date);
-    await interaction.reply(poll);
+  const date = interaction.options.getString('date');
+
+  const poll  = createRehearsalPoll(date);
+  await interaction.reply(poll);
+
+
 }
 export default {
     data: data,
