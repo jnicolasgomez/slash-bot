@@ -38,7 +38,7 @@ for (const file of commandFiles) {
 
 client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}`);
-    cron.schedule('24 17 * * 2', async () => {
+    cron.schedule('0 10 * * 1', async () => {
         console.log('Running the scheduled task!');
         const nextSundayDate = getNextSundayDateString();
         const commandName = "rehearsal";
