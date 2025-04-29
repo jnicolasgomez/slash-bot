@@ -2,8 +2,10 @@ import { Client, Collection, GatewayIntentBits, Partials } from 'discord.js';
 import fs from 'fs';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
-import express from 'express';
-import { createServer } from 'http';
+import cron from 'node-cron';
+import { createRehearsalPoll } from './utils/rehearsalPoll.js';
+// import express from 'express';
+// import { createServer } from 'http';
 
 dotenv.config();
 const client = new Client({
@@ -34,9 +36,33 @@ for (const file of commandFiles) {
     client.slashCommands.set(command.data.name, command);
 }
 
-client.on('ready', () => {
+client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}`);
-});
+    cron.schedule('0 10 * * 1', async () => {
+        console.log('Running the scheduled task!');
+        const nextSundayDate = getNextSundayDateString();
+        const commandName = "rehearsal";
+        const rehearsalCommand = client.slashCommands.find(cmd => cmd.data.name == commandName);
+        if (rehearsalCommand) {
+          const guild = client.guilds.cache.get(process.env.DISCORD_GUILD_ID); // Replace with your server ID
+          if (guild) {
+            const channel = guild.channels.cache.find(ch => ch.name === 'pruebas'); // Replace with your target channel name or ID
+            const poll = createRehearsalPoll(nextSundayDate);
+            await channel.send( poll); // Or any other relevant content
+            
+            console.log("Sent message to channel:", channel.name);
+
+          } else {
+            console.log('Guild not found.');
+          }
+        } else {
+          console.log(`Command "${commandName}" not found.`);
+        }
+      }, {
+        scheduled: true,
+        timezone: 'America/Bogota' // Specify the Bogotá timezone
+      });
+    });
 
 client.on("interactionCreate", async (interaction) => {
     if (interaction.isChatInputCommand()) {
@@ -59,26 +85,41 @@ client.login(process.env.DISCORD_TOKEN)
         console.error('Error logging in:', error);
     });
 
-(async () => {
-    await mongoose.connect(process.env.MONGODB_URI);
-    console.log('Connected to MongoDB');
-}
-)().catch((error) => {
-    console.error('Error connecting to MongoDB:', error);
-}
-);
+// (async () => {
+//     await mongoose.connect(process.env.MONGODB_URI);
+//     console.log('Connected to MongoDB');
+// }
+// )().catch((error) => {
+//     console.error('Error connecting to MongoDB:', error);
+// }
+// );
+
+function getNextSundayDateString() {
+    const now = new Date('2025-04-28T11:38:00-05:00'); // Starting from the current date and time in Bogotá
+    const dayOfWeek = now.getDay(); // 0 for Sunday, 1 for Monday, etc.
+    const daysUntilSunday = (7 - dayOfWeek) % 7; // Calculate how many days until the next Sunday
+    const nextSunday = new Date(now);
+    nextSunday.setDate(now.getDate() + daysUntilSunday);
+  
+    return nextSunday.toLocaleString('es-CO', { // 'es-CO' for Colombian Spanish
+        timeZone: 'America/Bogota',
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long'
+      });;
+  }
 
 // Start express server
-const app = express();
-const server = createServer(app);
+// const app = express();
+// const server = createServer(app);
 
-const PORT = process.env.PORT || 3000;
+// const PORT = process.env.PORT || 3000;
 
-app.get('/', (req, res) => {
-    res.send('Bot is running!');
-});
+// app.get('/', (req, res) => {
+//     res.send('Bot is running!');
+// });
 
-server.listen(PORT, () => {
-    console.log(`Express server is running on port ${PORT}`);
-});
+// server.listen(PORT, () => {
+//     console.log(`Express server is running on port ${PORT}`);
+// });
 
