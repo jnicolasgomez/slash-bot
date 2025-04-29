@@ -3,6 +3,7 @@ import fs from 'fs';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import cron from 'node-cron';
+import { createRehearsalPoll } from './utils/rehearsalPoll.js';
 // import express from 'express';
 // import { createServer } from 'http';
 
@@ -37,42 +38,20 @@ for (const file of commandFiles) {
 
 client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}`);
-    console.log(`Commands: ${JSON.stringify(client.slashCommands.find(cmd => cmd.data.name === "rehearsal"))}`);
-    // cron.schedule('3 20 * * 1', async () => {
+    cron.schedule('24 17 * * 2', async () => {
         console.log('Running the scheduled task!');
-
         const nextSundayDate = getNextSundayDateString();
-        console.log(`Next Sunday date: ${nextSundayDate}`);
-    
         const commandName = "rehearsal";
         const rehearsalCommand = client.slashCommands.find(cmd => cmd.data.name == commandName);
         if (rehearsalCommand) {
-          // Simulate a message object to pass to your command's execute function
           const guild = client.guilds.cache.get(process.env.DISCORD_GUILD_ID); // Replace with your server ID
           if (guild) {
-            
             const channel = guild.channels.cache.find(ch => ch.name === 'pruebas'); // Replace with your target channel name or ID
-            console.log(channel);
-            await channel.send( `/${commandName} ${nextSundayDate}`); // Or any other relevant content
+            const poll = createRehearsalPoll(nextSundayDate);
+            await channel.send( poll); // Or any other relevant content
             
             console.log("Sent message to channel:", channel.name);
 
-            // const message = {
-            // client: client,
-            // guild: guild,
-            // channel: channel,
-            // content: `!${commandName} ${nextSundayDate}`, // Or any other relevant content
-            // author: client.user, // Simulate the bot as the author
-            // member: guild.members.cache.get(client.user.id),
-            // // You might need to add more properties depending on your command's needs
-            // };
-
-            // try {
-            //     await rehearsalCommand.execute(message, null, [nextSundayDate]); // Assuming your command function takes message and args
-            //     console.log(`Successfully executed command: ${commandName}`);
-            // } catch (error) {
-            //     console.error(`There was an error executing command ${commandName}:`, error);
-            // }
           } else {
             console.log('Guild not found.');
           }
@@ -83,8 +62,7 @@ client.on('ready', async () => {
         scheduled: true,
         timezone: 'America/Bogota' // Specify the Bogotá timezone
       });
-//}
-//);
+    });
 
 client.on("interactionCreate", async (interaction) => {
     if (interaction.isChatInputCommand()) {
@@ -107,14 +85,14 @@ client.login(process.env.DISCORD_TOKEN)
         console.error('Error logging in:', error);
     });
 
-(async () => {
-    //await mongoose.connect(process.env.MONGODB_URI);
-    //console.log('Connected to MongoDB');
-}
-)().catch((error) => {
-    console.error('Error connecting to MongoDB:', error);
-}
-);
+// (async () => {
+//     await mongoose.connect(process.env.MONGODB_URI);
+//     console.log('Connected to MongoDB');
+// }
+// )().catch((error) => {
+//     console.error('Error connecting to MongoDB:', error);
+// }
+// );
 
 function getNextSundayDateString() {
     const now = new Date('2025-04-28T11:38:00-05:00'); // Starting from the current date and time in Bogotá
