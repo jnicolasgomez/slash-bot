@@ -1,5 +1,8 @@
 import { SlashCommandBuilder,
     EmbedBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    ActionRowBuilder,
     REST,
     Routes} from "discord.js";
 
@@ -16,7 +19,6 @@ export async function execute(client, interaction) {
     // fetch poll message and send a reminder mentioning users that haven't voted
     const pollMessageId = interaction.options.getString('poll-message-id');
     const pollMessage = await interaction.channel.messages.fetch(pollMessageId);
-    //console.log(pollMessage);
     //console.log(getPollVoters(pollMessage.channelId, pollMessage.id, pollMessage.poll.answers[0].id));
     const nonVoters = await getNonVoters(client, pollMessage);
     const pollDuration = pollMessage.poll.expiresTimestamp;
@@ -27,13 +29,23 @@ export async function execute(client, interaction) {
     const timeLeftInMinutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
     const timeLeftInSeconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
     const timeLeftString = `${timeLeftInHours}h ${timeLeftInMinutes}m ${timeLeftInSeconds}s`;
+
+    // Create the button to jump to the message
+    const jumpToMessageButton = new ButtonBuilder()
+    .setLabel('Ir a la encuesta')
+    .setStyle(ButtonStyle.Link)
+    .setURL(`https://discord.com/channels/${pollMessage.guildId}/${pollMessage.channelId}/${pollMessage.id}`);
+
+    const actionRow = new ActionRowBuilder()
+            .addComponents(jumpToMessageButton);
+
     const reminderEmbed = new EmbedBuilder()
         .setColor('#0099ff')
         .setTitle('Recordatorio')
         .setDescription(`${nonVoters} faltan por votar, encuesta termina en ${timeLeftString}`)
         .setTimestamp()
         .setFooter({ text: 'Poll Reminder' });
-    await interaction.reply({ embeds: [reminderEmbed] });
+    await interaction.reply({ embeds: [reminderEmbed], components: [actionRow]  });
 
     // Send a message to the channel
     // await interaction.reply(`@everyone ${interaction.user} ha recordado que la encuesta de ensayo termina en ${timeLeftString}`);
