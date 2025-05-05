@@ -39,14 +39,14 @@ for (const file of commandFiles) {
 client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}`);
     cron.schedule('0 10 * * 1', async () => {
-        console.log('Running the scheduled task!');
+        console.log(`Running the scheduled task on date ${new Date()}!`);
         const nextSundayDate = getNextSundayDateString();
         const commandName = "rehearsal";
         const rehearsalCommand = client.slashCommands.find(cmd => cmd.data.name == commandName);
         if (rehearsalCommand) {
           const guild = client.guilds.cache.get(process.env.DISCORD_GUILD_ID); // Replace with your server ID
           if (guild) {
-            const channel = guild.channels.cache.find(ch => ch.name === 'pruebas'); // Replace with your target channel name or ID
+            const channel = guild.channels.cache.find(ch => ch.name === 'general'); // Replace with your target channel name or ID
             const poll = createRehearsalPoll(nextSundayDate);
             await channel.send( poll); // Or any other relevant content
             
